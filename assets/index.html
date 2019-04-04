@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div id="app">
+    <v-layout column wrap>
+            
+        <v-card>
+            <v-flex xs12>
+                    <v-layout row wrap>
+                        <v-toolbar color="black" fixed app flat class="primary">
+                                    <v-toolbar-title class="white--text">
+                                        <img height = 50px src = "CoderIQLogo.png"/>
+                                    </v-toolbar-title>
+                                    <v-spacer></v-spacer>
+                                    <v-toolbar-items class="hidden-sm-and-down toolbar-items">
+                                        <slot></slot>
+                                    </v-toolbar-items>
+                                </v-toolbar>
+                        
+                    </v-layout>
+                </v-flex>
+            <div style="margin-top:50px">
+            <v-card-title class="pt-4 mt-4" >
+            <div>
+                <span ><h2 class="text-primary">Problem: News Analyzer</h2></span>
+                <span><h3>This is the web interface to showcase your project. Press the buttons below to check the output of the code deployed. This tool will be used by the admin to evaluate your code.
+                    <h3></span>
+            </div>
+            </v-card-title>
+        </div>
+        </v-card>
+        <div class="container">
+            <div class="col align-self-center">
+            <v-flex  xs12>
+                    <v-layout row wrap class="mt-4">
+                        <v-btn class="mt-3" @click="routeRequest(1)"  medium color="#bffff1"><b>Problem 1</b></v-btn>
+                        <div class="ml-4"><v-textarea v-model="timestamp1"  auto-grow box color="#1e8694" label="Timestamp 1" rows="1" no-resize></v-textarea></div>
+                        <div class="ml-4"><v-textarea v-model="timestamp2"  auto-grow box color="#1e8694" label="Timestamp 2" rows="1" no-resize></v-textarea></div>
+                        <div class="ml-4" style="width: 500px"><v-textarea v-model="prob1out" outline label="Problem 1 output" readonly></v-textarea></div>
+                    </v-layout>
+                    <v-layout row wrap class="mt-4">
+                        <v-btn class="mt-3" @click="routeRequest(2)" medium color="#bffff1"><b>Problem 2</b></v-btn>
+                        <div style="visibility: hidden" class="ml-4"><v-textarea v-model="timestamp1"  auto-grow box color="#1e8694" label="Timestamp 1" rows="1" no-resize></v-textarea></div>
+                        <div style="visibility: hidden" class="ml-4"><v-textarea v-model="timestamp2"  auto-grow box color="#1e8694" label="Timestamp 2" rows="1" no-resize></v-textarea></div>
+                        <div class="ml-4" style="width: 500px"><v-textarea v-model="prob2out" outline label="Problem 2 output" readonly></v-textarea></div>
+                    </v-layout>
+                    <v-layout row wrap class="mt-4">
+                        <v-btn class="mt-3" @click="routeRequest(3)" medium color="#bffff1"><b>Problem 3</b></v-btn>
+                        <div  class="ml-4"><v-textarea v-model="valueN" auto-grow box color="#1e8694" label="Input n" rows="1" no-resize></v-textarea></div>
+                        <div style="visibility: hidden" class="ml-4"><v-textarea v-model="bio"  auto-grow box color="#1e8694" label="Timestamp 2" rows="1" no-resize></v-textarea></div>
+                        <div class="ml-4" style="width: 500px"><v-textarea v-model="prob3out" outline label="Problem 3 output" readonly></v-textarea></div>
+                    </v-layout>
+                </v-flex>
+            </div>
+        </div>
+        
+                  
+    </v-layout>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <script>
+    new Vue({ 
+        el: '#app',
+        data(){
+            return{
+                prob1out: 'The first problem output will come here.',
+                prob2out: 'The second problem output will come here.',
+                prob3out: 'The third problem output will come here.',
+                timestamp1: '',
+                timestamp2: '',
+                valueN: 0,
+		baseUrl: '',
+            }
+        },
+        methods:{
+            async routeRequest(btnId){   
+                switch(btnId){
+                    case 1:
+                        this.prob1out = await this.sendRequest({"t1":this.timestamp1,"t2":this.timestamp2},"output_prob1",this)
+                        break;
+                    case 2:
+                        this.prob2out = await this.sendRequest({},"output_prob2",this)
+                        break;
+                    case 3:
+                        this.prob3out = await this.sendRequest({"n":this.valueN},"output_prob3",this)
+                        break;
+                }
+            },
+            sendRequest(data,apiUrlExtension,vm){
+                return new Promise((resolve, reject) => {
+                const http = new XMLHttpRequest();
+                http.open("POST", this.baseUrl+apiUrlExtension);
+                http.setRequestHeader("content-type", "application/json");
+                http.setRequestHeader("accept", "application/json");
+                http.onreadystatechange = function(){
+                    if (http.readyState === 4) {
+                   
+                    if(http.responseText){
+                        return resolve(http.responseText);
+                    } else {
+                        return resolve(true);
+                    }
+                }
+                }
+                http.send(JSON.stringify(data));
+                });
+            },
+               
+        },
+	created(){
+		const arr = window.location.href.toString().split(':')
+		this.baseUrl = arr[0]+":"+arr[1]+":"+(parseInt(arr[2])+1).toString()+"/"
+	}
+    })
+  </script>
+  <style>
+      .id{
+          width: 100%;
+          height: 100%;
+      }
+  </style>
+</body>
+</html>
